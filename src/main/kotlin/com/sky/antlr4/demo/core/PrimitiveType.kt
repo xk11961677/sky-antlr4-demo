@@ -8,16 +8,18 @@ class PrimitiveType private constructor(private val name: String) {
 
     companion object {
         // 把常见的基础数据类型都定义出来
-        var Integer = PrimitiveType("Integer")
-        var Long = PrimitiveType("Long")
-        var Float = PrimitiveType("Float")
-        var Double = PrimitiveType("Double")
-        var Boolean = PrimitiveType("Boolean")
-        var Byte = PrimitiveType("Byte")
-        var Char = PrimitiveType("Char")
-        var Short = PrimitiveType("Short")
-        var String = PrimitiveType("Short") //增加String为基础类型
-        var Null = PrimitiveType("null")
+        val Integer = PrimitiveType("Integer")
+        val Long = PrimitiveType("Long")
+        val Float = PrimitiveType("Float")
+        val Double = PrimitiveType("Double")
+        val Boolean = PrimitiveType("Boolean")
+        val Byte = PrimitiveType("Byte")
+        val Char = PrimitiveType("Char")
+        val Short = PrimitiveType("Short")
+        val String = PrimitiveType("String")
+        val Null = PrimitiveType("null")
+
+        val container = listOf(Integer,Long,Float,Double,Boolean,Byte,Char,Short,String,Null)
 
         /**
          * 计算两个类型中比较“高”的一级，比如int和long相加，要取long
@@ -53,6 +55,10 @@ class PrimitiveType private constructor(private val name: String) {
          */
         fun isNumeric(type: PrimitiveType): Boolean {
             return type === Byte || type === Short || type === Integer || type === Long || type === Float || type === Double
+        }
+
+        fun get(identifier:String):PrimitiveType {
+            return container.first{ it.name.uppercase() == identifier.uppercase()}
         }
     }
 }

@@ -3,15 +3,10 @@
 //options { tokenVocab=CommonLexer; }
 import CommonLexer;
 
-//parse
-//    : expression* EOF
-//    ;
-
 expression
     : primary
-    | expression bop='.'
     | expression '[' expression ']'
-    | '(' typeType ')' expression
+    | expectType= '(' typeType ')' expression
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
     | prefix=('~'|'!') expression
@@ -26,9 +21,9 @@ expression
     | expression bop='&&' expression
     | expression bop='||' expression
     | expression bop='?' expression ':' expression  // 三目表达式
-    | <assoc=right> expression
-      bop=('=' | '+=' | '-=' | '*=' | '/=' | '&=' | '|=' | '^=' | '>>=' | '>>>=' | '<<=' | '%=')
-      expression
+//    | <assoc=right> expression
+//      bop=('=' | '+=' | '-=' | '*=' | '/=' | '&=' | '|=' | '^=' | '>>=' | '>>>=' | '<<=' | '%=')
+//      expression
     ;
 
 
@@ -60,7 +55,7 @@ floatLiteral
     ;
 
 typeType
-    : (primitiveType) ('[' ']')*
+    : (IDENTIFIER | primitiveType)
     ;
 
 primitiveType

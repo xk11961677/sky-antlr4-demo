@@ -4,53 +4,63 @@ import com.sky.antlr4.demo.parser.ArithmeticBaseVisitor
 import com.sky.antlr4.demo.parser.ArithmeticParser.*
 import java.lang.Boolean
 import kotlin.Any
+import kotlin.IllegalArgumentException
 
 
 class CustomArithmeticBaseVisitor : ArithmeticBaseVisitor<Any>() {
 
     override fun visitExpression(ctx: ExpressionContext): Any {
-        var rtn: Any? = null
+        var rtn: Any?=null
         if (ctx.bop != null && ctx.expression().size >= 2) {
             val left = visitExpression(ctx.expression(0))
             val right = visitExpression(ctx.expression(1))
-            var leftObject = (left as Literal).value
-            var rightObject = (right as Literal).value
-            var leftType = left.type
-            var rightType = right.type
-
-            //左右两个子节点的类型
-            when (ctx.bop.type) {
-                ADD -> rtn = ArithmeticUtils.add(leftObject, rightObject, PrimitiveType.getUpperType(leftType, rightType))
-                SUB -> rtn = ArithmeticUtils.minus(leftObject, rightObject, PrimitiveType.getUpperType(leftType, rightType))
-                MUL -> rtn = ArithmeticUtils.mul(leftObject, rightObject, PrimitiveType.getUpperType(leftType, rightType))
-                DIV -> rtn = ArithmeticUtils.div(leftObject, rightObject, PrimitiveType.getUpperType(leftType, rightType))
-                EQUAL -> rtn = ArithmeticUtils.eq(leftObject, rightObject, PrimitiveType.getUpperType(leftType, rightType))
-                NOTEQUAL -> rtn = !ArithmeticUtils.eq(leftObject, rightObject, PrimitiveType.getUpperType(leftType, rightType))
-                LE -> rtn = ArithmeticUtils.le(leftObject, rightObject, PrimitiveType.getUpperType(leftType, rightType))
-                LT -> rtn = ArithmeticUtils.lt(leftObject, rightObject, PrimitiveType.getUpperType(leftType, rightType))
-                GE -> rtn = ArithmeticUtils.ge(leftObject, rightObject, PrimitiveType.getUpperType(leftType, rightType))
-                GT -> rtn = ArithmeticUtils.gt(leftObject, rightObject, PrimitiveType.getUpperType(leftType, rightType))
-                AND -> rtn = leftObject.toString().toBoolean() && rightObject.toString().toBoolean()
-                OR -> rtn = leftObject.toString().toBoolean() || rightObject.toString().toBoolean()
-                ASSIGN ->  println("Unsupported feature during assignment")
-                else -> {
-                    println("aaaa")
-                }
-            }
-        } else if (ctx.bop != null && ctx.bop.type === DOT) {
-            // 此语法是左递归的，算法体现这一点
-            val leftObject = visitExpression(ctx.expression(0))
-            println("Expecting an Object Reference")
-        } else if (ctx.primary() != null) {
+            rtn = calculate(ctx,left,right, null)
+        }  else if (ctx.primary() != null) {
             rtn = visitPrimary(ctx.primary())
         } else if (ctx.postfix != null) {
+            //todo 进行运算
             var value = visitExpression(ctx.expression(0))
             rtn = value
-        } else if(ctx.typeType() != null) {
-            // todo 强转
-            println()
+        }else if(ctx.expectType != null && ctx.expression().size ==1) {
+            val typeType = ctx.typeType()
+            val typeLiteral = typeType.primitiveType()?.text?:typeType.IDENTIFIER().text
+            val expectType= PrimitiveType.get(typeLiteral)
+            val value = visitExpression(ctx.expression(0))
+            rtn = Literal.cast(value, expectType).value
+        }else {
+            super.visitChildren(ctx)
         }
         return rtn!!
+    }
+
+    private fun calculate(ctx: ExpressionContext,left:Any, right:Any , expectType: PrimitiveType?): Any? {
+        var rtn:Any?
+        var leftObject = (left as Literal).value
+        var rightObject = (right as Literal).value
+        var leftType = left.type
+        var rightType = right.type
+
+        val type = expectType ?: PrimitiveType.getUpperType(leftType, rightType)
+
+        //左右两个子节点的类型
+        rtn = when (ctx.bop.type) {
+            ADD -> ArithmeticUtils.add(leftObject, rightObject, type)
+            SUB -> ArithmeticUtils.minus(leftObject, rightObject, type)
+            MUL -> ArithmeticUtils.mul(leftObject, rightObject, type)
+            DIV -> ArithmeticUtils.div(leftObject, rightObject, type)
+            EQUAL -> ArithmeticUtils.eq(leftObject, rightObject, type)
+            NOTEQUAL -> !ArithmeticUtils.eq(leftObject, rightObject, type)
+            LE -> ArithmeticUtils.le(leftObject, rightObject, type)
+            LT -> ArithmeticUtils.lt(leftObject, rightObject, type)
+            GE -> ArithmeticUtils.ge(leftObject, rightObject, type)
+            GT -> ArithmeticUtils.gt(leftObject, rightObject, type)
+            AND -> leftObject.toString().toBoolean() && rightObject.toString().toBoolean()
+            OR -> leftObject.toString().toBoolean() || rightObject.toString().toBoolean()
+            else -> {
+                throw IllegalArgumentException("Unsupported feature during unknown")
+            }
+        }
+        return rtn
     }
 
     override fun visitLiteral(ctx: LiteralContext): Any? {
@@ -90,14 +100,13 @@ class CustomArithmeticBaseVisitor : ArithmeticBaseVisitor<Any>() {
         return Literal.of(java.lang.Float.valueOf(ctx.text),PrimitiveType.Float)
     }
 
-
     override fun visitPrimary(ctx: PrimaryContext): Any? {
         var rtn: Any? = null
         //字面量
         if (ctx.literal() != null) {
             rtn = visitLiteral(ctx.literal())
         } else if (ctx.IDENTIFIER() != null) {
-            println("标识")
+            rtn = ctx.IDENTIFIER().text
         } else if (ctx.expression() != null) {
             rtn = visitExpression(ctx.expression())
         }

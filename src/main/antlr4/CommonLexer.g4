@@ -40,7 +40,6 @@
 
 lexer grammar CommonLexer;
 
-
 // Literals
 
 DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;
@@ -108,12 +107,7 @@ MOD_ASSIGN:         '%=';
 LSHIFT_ASSIGN:      '<<=';
 RSHIFT_ASSIGN:      '>>=';
 URSHIFT_ASSIGN:     '>>>=';
-// Java 8 tokens
-ARROW:              '->';
-COLONCOLON:         '::';
-// Additional symbols not defined in the lexical specification
-AT:                 '@';
-ELLIPSIS:           '...';
+
 // Whitespace and comments
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
 COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
