@@ -26,7 +26,7 @@ class CustomArithmeticBaseVisitor : ArithmeticBaseVisitor<Any>() {
             val typeLiteral = typeType.primitiveType()?.text?:typeType.IDENTIFIER().text
             val expectType= PrimitiveType.get(typeLiteral)
             val value = visitExpression(ctx.expression(0))
-            rtn = Literal.cast(value, expectType).value
+            rtn = Literal.cast(value, expectType)
         }else {
             super.visitChildren(ctx)
         }
@@ -49,7 +49,7 @@ class CustomArithmeticBaseVisitor : ArithmeticBaseVisitor<Any>() {
             MUL -> ArithmeticUtils.mul(leftObject, rightObject, type)
             DIV -> ArithmeticUtils.div(leftObject, rightObject, type)
             EQUAL -> ArithmeticUtils.eq(leftObject, rightObject, type)
-            NOTEQUAL -> !ArithmeticUtils.eq(leftObject, rightObject, type)
+            NOTEQUAL -> ArithmeticUtils.notEq(leftObject, rightObject, type)
             LE -> ArithmeticUtils.le(leftObject, rightObject, type)
             LT -> ArithmeticUtils.lt(leftObject, rightObject, type)
             GE -> ArithmeticUtils.ge(leftObject, rightObject, type)

@@ -35,3 +35,5 @@ Thumbs.db
 
 # license check result
 license-list
+
+/src/main/kotlin/com/sky/antlr4/demo/parser/

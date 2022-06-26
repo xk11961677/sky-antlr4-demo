@@ -5,59 +5,60 @@
  */
 object ArithmeticUtils {
 
-    fun add(obj1: Any, obj2: Any, targetType: PrimitiveType): Any? {
-        var rtn: Any? = null
-        if (targetType === PrimitiveType.String) {
-            rtn = obj1.toString() + obj2.toString()
+    fun add(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
+        val rtn = if (targetType === PrimitiveType.String) {
+            obj1.toString() + obj2.toString()
         } else if (targetType === PrimitiveType.Integer) {
-            rtn = (obj1 as Number).toInt() + (obj2 as Number).toInt()
+            (obj1 as Number).toInt() + (obj2 as Number).toInt()
         } else if (targetType === PrimitiveType.Float) {
-            rtn = (obj1 as Number).toFloat() + (obj2 as Number).toFloat()
+            (obj1 as Number).toFloat() + (obj2 as Number).toFloat()
         } else if (targetType === PrimitiveType.Long) {
-            rtn = (obj1 as Number).toLong() + (obj2 as Number).toLong()
+            (obj1 as Number).toLong() + (obj2 as Number).toLong()
         } else if (targetType === PrimitiveType.Double) {
-            rtn = (obj1 as Number).toDouble() + (obj2 as Number).toDouble()
+            (obj1 as Number).toDouble() + (obj2 as Number).toDouble()
         } else if (targetType === PrimitiveType.Short) {
-            rtn = (obj1 as Number).toShort() + (obj2 as Number).toShort()
+            (obj1 as Number).toShort() + (obj2 as Number).toShort()
         } else {
-            println("unsupported add operation")
+            throw IllegalArgumentException("无法计算add")
         }
-        return rtn
+        return Literal.of(rtn,targetType)
     }
 
-    fun minus(obj1: Any, obj2: Any, targetType: PrimitiveType): Any? {
-        var rtn: Any? = null
-        if (targetType === PrimitiveType.Integer) {
-            rtn = (obj1 as Number).toInt() - (obj2 as Number).toInt()
+    fun minus(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
+        val rtn = if (targetType === PrimitiveType.Integer) {
+            (obj1 as Number).toInt() - (obj2 as Number).toInt()
         } else if (targetType === PrimitiveType.Float) {
-            rtn = (obj1 as Number).toFloat() - (obj2 as Number).toFloat()
+            (obj1 as Number).toFloat() - (obj2 as Number).toFloat()
         } else if (targetType === PrimitiveType.Long) {
-            rtn = (obj1 as Number).toLong() - (obj2 as Number).toLong()
+            (obj1 as Number).toLong() - (obj2 as Number).toLong()
         } else if (targetType === PrimitiveType.Double) {
-            rtn = (obj1 as Number).toDouble() - (obj2 as Number).toDouble()
+            (obj1 as Number).toDouble() - (obj2 as Number).toDouble()
         } else if (targetType === PrimitiveType.Short) {
-            rtn = (obj1 as Number).toShort() - (obj2 as Number).toShort()
+            (obj1 as Number).toShort() - (obj2 as Number).toShort()
+        }else {
+            throw IllegalArgumentException("无法计算minus")
         }
-        return rtn
+        return Literal.of(rtn,targetType)
     }
 
-    fun mul(obj1: Any, obj2: Any, targetType: PrimitiveType): Any? {
-        var rtn: Any? = null
-        if (targetType === PrimitiveType.Integer) {
-            rtn = (obj1 as Number).toInt() * (obj2 as Number).toInt()
+    fun mul(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
+        val rtn = if (targetType === PrimitiveType.Integer) {
+            (obj1 as Number).toInt() * (obj2 as Number).toInt()
         } else if (targetType === PrimitiveType.Float) {
-            rtn = (obj1 as Number).toFloat() * (obj2 as Number).toFloat()
+            (obj1 as Number).toFloat() * (obj2 as Number).toFloat()
         } else if (targetType === PrimitiveType.Long) {
-            rtn = (obj1 as Number).toLong() * (obj2 as Number).toLong()
+            (obj1 as Number).toLong() * (obj2 as Number).toLong()
         } else if (targetType === PrimitiveType.Double) {
-            rtn = (obj1 as Number).toDouble() * (obj2 as Number).toDouble()
+            (obj1 as Number).toDouble() * (obj2 as Number).toDouble()
         } else if (targetType === PrimitiveType.Short) {
-            rtn = (obj1 as Number).toShort() * (obj2 as Number).toShort()
+            (obj1 as Number).toShort() * (obj2 as Number).toShort()
+        }else {
+            throw IllegalArgumentException("无法计算mul")
         }
-        return rtn
+        return Literal.of(rtn,targetType)
     }
 
-    fun div(obj1: Any, obj2: Any, targetType: PrimitiveType): Any? {
+    fun div(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
         var rtn: Any? = null
         if (targetType === PrimitiveType.Integer) {
             rtn = (obj1 as Number).toInt() / (obj2 as Number).toInt()
@@ -69,11 +70,13 @@ object ArithmeticUtils {
             rtn = (obj1 as Number).toDouble() / (obj2 as Number).toDouble()
         } else if (targetType === PrimitiveType.Short) {
             rtn = (obj1 as Number).toShort() / (obj2 as Number).toShort()
+        }else {
+            throw IllegalArgumentException("无法计算div")
         }
-        return rtn
+        return Literal.of(rtn,targetType)
     }
 
-    fun eq(obj1: Any, obj2: Any, targetType: PrimitiveType): Boolean {
+    fun eq(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
         var rtn = if (targetType === PrimitiveType.Integer) {
             (obj1 as Number).toInt() == (obj2 as Number).toInt()
         } else if (targetType === PrimitiveType.Float) {
@@ -87,7 +90,12 @@ object ArithmeticUtils {
         } else {
             obj1 === obj2
         }
-        return rtn
+        return Literal.of(rtn,PrimitiveType.Boolean)
+    }
+
+    fun notEq(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
+        val literal = eq(obj1, obj2, targetType) as Literal
+        return Literal.of(!(literal.value as Boolean), PrimitiveType.Boolean)
     }
 
     fun ge(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
@@ -102,10 +110,9 @@ object ArithmeticUtils {
         } else if (targetType === PrimitiveType.Short) {
             (obj1 as Number).toShort() >= (obj2 as Number).toShort()
         } else {
-            //todo
-            println("该对象无法比较大小")
+            throw IllegalArgumentException("无法计算ge")
         }
-        return rtn
+        return Literal.of(rtn,PrimitiveType.Boolean)
     }
 
     fun gt(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
@@ -119,11 +126,10 @@ object ArithmeticUtils {
             (obj1 as Number).toDouble() > (obj2 as Number).toDouble()
         } else if (targetType === PrimitiveType.Short) {
             (obj1 as Number).toShort() > (obj2 as Number).toShort()
-        }else {
-            //todo
-            println("该对象无法比较大小")
+        } else {
+            throw IllegalArgumentException("无法计算gt")
         }
-        return rtn
+        return Literal.of(rtn,PrimitiveType.Boolean)
     }
 
     fun le(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
@@ -138,10 +144,9 @@ object ArithmeticUtils {
         } else if (targetType === PrimitiveType.Short) {
             (obj1 as Number).toShort() <= (obj2 as Number).toShort()
         }else {
-            // todo
-            println("该对象无法比较大小")
+            throw IllegalArgumentException("无法计算le")
         }
-        return rtn
+        return Literal.of(rtn,PrimitiveType.Boolean)
     }
 
     fun lt(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
@@ -156,9 +161,8 @@ object ArithmeticUtils {
         } else if (targetType === PrimitiveType.Short) {
             (obj1 as Number).toShort() < (obj2 as Number).toShort()
         }else {
-            //todo
-            println("该对象无法比较大小")
+            throw IllegalArgumentException("无法计算lt")
         }
-        return rtn
+        return Literal.of(rtn,PrimitiveType.Boolean)
     }
 }
