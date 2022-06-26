@@ -9,7 +9,8 @@ private val log = LogManager.getLogger(Application::class.java)
 
 fun main() {
 //    val dsl = "(Double)(2 + 1)"
-    val dsl = "(2>1 && 1<0)"
+//    val dsl = "(2>1 && 1<0)"
+    val dsl = "-1"
     val ctx = DslContext(dsl)
     val validation = DslExecutor.validate(ctx)
     println("规则合法可配置:  validation:$validation")

@@ -10,31 +10,69 @@ import kotlin.IllegalArgumentException
 class CustomArithmeticBaseVisitor : ArithmeticBaseVisitor<Any>() {
 
     override fun visitExpression(ctx: ExpressionContext): Any {
-        var rtn: Any?=null
-        if (ctx.bop != null && ctx.expression().size >= 2) {
+        val rtn = if (ctx.bop != null && ctx.expression().size >= 2) {
             val left = visitExpression(ctx.expression(0))
             val right = visitExpression(ctx.expression(1))
-            rtn = calculate(ctx,left,right, null)
+            calculate(ctx,left,right, null)
         }  else if (ctx.primary() != null) {
-            rtn = visitPrimary(ctx.primary())
+            visitPrimary(ctx.primary())
         } else if (ctx.postfix != null) {
-            //todo 进行运算
-            var value = visitExpression(ctx.expression(0))
-            rtn = value
+            var value = visitExpression(ctx.expression(0)) as Literal
+            val rtn = when (ctx.postfix.type) {
+                INC -> {
+                    ArithmeticUtils.incr(value, value.type)
+                }
+                DEC -> {
+                    ArithmeticUtils.decr(value, value.type)
+                }
+                else -> {
+                    throw IllegalArgumentException("无法解析表达式")
+                }
+            }
+            rtn
         }else if(ctx.expectType != null && ctx.expression().size ==1) {
             val typeType = ctx.typeType()
             val typeLiteral = typeType.primitiveType()?.text?:typeType.IDENTIFIER().text
             val expectType= PrimitiveType.get(typeLiteral)
             val value = visitExpression(ctx.expression(0))
-            rtn = Literal.cast(value, expectType)
+            Literal.cast(value, expectType)
+        }else if(ctx.prefix != null) {
+            var value = visitExpression(ctx.expression(0)) as Literal
+            val rtn = when (ctx.prefix.type) {
+                INC -> {
+                    ArithmeticUtils.incr(value, value.type)
+                }
+                DEC -> {
+                    ArithmeticUtils.decr(value, value.type)
+                }
+                BANG -> {
+                    Literal.of(!value.toString().toBoolean(),PrimitiveType.Boolean)
+                }
+                TILDE -> {
+                    throw IllegalArgumentException("暂不支持非运算符")
+                }
+                ADD -> {
+                    // 正号
+                    value
+                }
+                SUB -> {
+                    // 负号
+                    var valueStr = (value).value.toString()
+                    val valueAfter = if(valueStr.startsWith("-")) valueStr.replaceFirst("-","") else "-$valueStr"
+                    Literal.cast(valueAfter,value.type)
+                }
+                else -> {
+                    throw IllegalArgumentException("无法解析表达式")
+                }
+            }
+            rtn
         }else {
             super.visitChildren(ctx)
         }
-        return rtn!!
+        return rtn
     }
 
-    private fun calculate(ctx: ExpressionContext,left:Any, right:Any , expectType: PrimitiveType?): Any? {
-        var rtn:Any?
+    private fun calculate(ctx: ExpressionContext,left:Any, right:Any , expectType: PrimitiveType?): Any {
         var leftObject = (left as Literal).value
         var rightObject = (right as Literal).value
         var leftType = left.type
@@ -43,7 +81,7 @@ class CustomArithmeticBaseVisitor : ArithmeticBaseVisitor<Any>() {
         val type = expectType ?: PrimitiveType.getUpperType(leftType, rightType)
 
         //左右两个子节点的类型
-        rtn = when (ctx.bop.type) {
+        val rtn = when (ctx.bop.type) {
             ADD -> ArithmeticUtils.add(leftObject, rightObject, type)
             SUB -> ArithmeticUtils.minus(leftObject, rightObject, type)
             MUL -> ArithmeticUtils.mul(leftObject, rightObject, type)
@@ -54,83 +92,92 @@ class CustomArithmeticBaseVisitor : ArithmeticBaseVisitor<Any>() {
             LT -> ArithmeticUtils.lt(leftObject, rightObject, type)
             GE -> ArithmeticUtils.ge(leftObject, rightObject, type)
             GT -> ArithmeticUtils.gt(leftObject, rightObject, type)
-            AND -> leftObject.toString().toBoolean() && rightObject.toString().toBoolean()
-            OR -> leftObject.toString().toBoolean() || rightObject.toString().toBoolean()
+            AND -> ArithmeticUtils.and(leftObject, rightObject)
+            OR -> ArithmeticUtils.or(leftObject, rightObject)
             else -> {
-                throw IllegalArgumentException("Unsupported feature during unknown")
+                throw IllegalArgumentException("暂不支持的表达式计算")
             }
         }
         return rtn
     }
 
-    override fun visitLiteral(ctx: LiteralContext): Any? {
-        var rtn: Any? = null
+    override fun visitLiteral(ctx: LiteralContext): Any {
         //整数
-        if (ctx.integerLiteral() != null) {
-            rtn = visitIntegerLiteral(ctx.integerLiteral())
+        val rtn = if (ctx.integerLiteral() != null) {
+            visitIntegerLiteral(ctx.integerLiteral())
         } else if (ctx.floatLiteral() != null) {
-            rtn = visitFloatLiteral(ctx.floatLiteral())
+            visitFloatLiteral(ctx.floatLiteral())
         } else if (ctx.BOOL_LITERAL() != null) {
-            rtn = if (ctx.BOOL_LITERAL().text == "true") {
+            if (ctx.BOOL_LITERAL().text == "true") {
                 Literal.of(Boolean.TRUE,PrimitiveType.Boolean)
             } else {
                 Literal.of(Boolean.FALSE,PrimitiveType.Boolean)
             }
         } else if (ctx.STRING_LITERAL() != null) {
             val withQuotationMark = ctx.STRING_LITERAL().text
-            rtn = withQuotationMark.substring(1, withQuotationMark.length - 1)
-            rtn = Literal.of(rtn,PrimitiveType.String)
+            Literal.of(withQuotationMark.substring(1, withQuotationMark.length - 1),PrimitiveType.String)
         } else if (ctx.CHAR_LITERAL() != null) {
-            rtn = Literal.of(ctx.CHAR_LITERAL().text[0],PrimitiveType.Char)
+            Literal.of(ctx.CHAR_LITERAL().text[0],PrimitiveType.Char)
         } else if (ctx.NULL_LITERAL() != null) {
-            rtn = Literal.of("null",PrimitiveType.Null)
+           Literal.of("null",PrimitiveType.Null)
+        } else {
+            throw IllegalArgumentException("不支持的字面量")
         }
         return rtn
     }
 
-    override fun visitIntegerLiteral(ctx: IntegerLiteralContext): Any? {
-        var rtn: Any? = null
-        if (ctx.DECIMAL_LITERAL() != null) {
-            rtn = Literal.of(Integer.valueOf(ctx.DECIMAL_LITERAL().text),PrimitiveType.Integer)
+    override fun visitIntegerLiteral(ctx: IntegerLiteralContext): Any {
+        val rtn = if (ctx.DECIMAL_LITERAL() != null) {
+            Literal.of(Integer.valueOf(ctx.DECIMAL_LITERAL().text),PrimitiveType.Integer)
+        }else if(ctx.HEX_LITERAL() != null) {
+             Literal.of(Integer.valueOf(ctx.HEX_LITERAL().text),PrimitiveType.Integer)
+        }else if(ctx.OCT_LITERAL() != null) {
+            Literal.of(Integer.valueOf(ctx.OCT_LITERAL().text),PrimitiveType.Integer)
+        }else if(ctx.BINARY_LITERAL() != null) {
+            Literal.of(Integer.valueOf(ctx.BINARY_LITERAL().text),PrimitiveType.Integer)
+        }else {
+            throw IllegalArgumentException("不支持的integer字面量")
         }
         return rtn
     }
 
-    override fun visitFloatLiteral(ctx: FloatLiteralContext): Any? {
+    override fun visitFloatLiteral(ctx: FloatLiteralContext): Any {
         return Literal.of(java.lang.Float.valueOf(ctx.text),PrimitiveType.Float)
     }
 
-    override fun visitPrimary(ctx: PrimaryContext): Any? {
-        var rtn: Any? = null
+    override fun visitPrimary(ctx: PrimaryContext): Any {
         //字面量
-        if (ctx.literal() != null) {
-            rtn = visitLiteral(ctx.literal())
+        val rtn = if (ctx.literal() != null) {
+            visitLiteral(ctx.literal())
         } else if (ctx.IDENTIFIER() != null) {
-            rtn = ctx.IDENTIFIER().text
+            ctx.IDENTIFIER().text
         } else if (ctx.expression() != null) {
-            rtn = visitExpression(ctx.expression())
+            visitExpression(ctx.expression())
+        } else {
+            throw IllegalArgumentException("不支持的表达式计算")
         }
         return rtn
     }
 
-    override fun visitPrimitiveType(ctx: PrimitiveTypeContext): Any? {
-        var rtn: Any? = null
-        if (ctx.INT() != null) {
-            rtn = INT
+    override fun visitPrimitiveType(ctx: PrimitiveTypeContext): Any {
+        val rtn = if (ctx.INT() != null) {
+            INT
         } else if (ctx.LONG() != null) {
-            rtn = LONG
+            LONG
         } else if (ctx.FLOAT() != null) {
-            rtn = FLOAT
+            FLOAT
         } else if (ctx.DOUBLE() != null) {
-            rtn = DOUBLE
+            DOUBLE
         } else if (ctx.BOOLEAN() != null) {
-            rtn = BOOLEAN
+            BOOLEAN
         } else if (ctx.CHAR() != null) {
-            rtn = CHAR
+            CHAR
         } else if (ctx.SHORT() != null) {
-            rtn = SHORT
+            SHORT
         } else if (ctx.BYTE() != null) {
-            rtn = BYTE
+            BYTE
+        }else {
+            throw IllegalArgumentException("不支持的类型")
         }
         return rtn
     }

@@ -2,6 +2,10 @@
 
 class Literal(val value:Any,val type:PrimitiveType) {
 
+    override fun toString(): String {
+        return "value=$value , type=$type"
+    }
+
     companion object {
         fun of(value: Any, type:PrimitiveType):Literal {
             return Literal(value,type)
@@ -15,7 +19,7 @@ class Literal(val value:Any,val type:PrimitiveType) {
                 PrimitiveType.Double -> value.toString().toDouble()
                 PrimitiveType.Boolean -> value.toString().toBoolean()
                 PrimitiveType.Byte -> value.toString().toByte()
-//                PrimitiveType.Char -> value.toString().charAt(0).toChar()
+                PrimitiveType.Char -> value.toString()[0]
                 PrimitiveType.Short -> value.toString().toShort()
                 PrimitiveType.String -> value.toString()
                 PrimitiveType.Null -> PrimitiveType.Null.toString()

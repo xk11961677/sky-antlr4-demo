@@ -1,6 +1,5 @@
 ﻿grammar Arithmetic;
 
-//options { tokenVocab=CommonLexer; }
 import CommonLexer;
 
 expression

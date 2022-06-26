@@ -59,17 +59,16 @@ object ArithmeticUtils {
     }
 
     fun div(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
-        var rtn: Any? = null
-        if (targetType === PrimitiveType.Integer) {
-            rtn = (obj1 as Number).toInt() / (obj2 as Number).toInt()
+        val rtn = if (targetType === PrimitiveType.Integer) {
+            (obj1 as Number).toInt() / (obj2 as Number).toInt()
         } else if (targetType === PrimitiveType.Float) {
-            rtn = (obj1 as Number).toFloat() / (obj2 as Number).toFloat()
+            (obj1 as Number).toFloat() / (obj2 as Number).toFloat()
         } else if (targetType === PrimitiveType.Long) {
-            rtn = (obj1 as Number).toLong() / (obj2 as Number).toLong()
+            (obj1 as Number).toLong() / (obj2 as Number).toLong()
         } else if (targetType === PrimitiveType.Double) {
-            rtn = (obj1 as Number).toDouble() / (obj2 as Number).toDouble()
+            (obj1 as Number).toDouble() / (obj2 as Number).toDouble()
         } else if (targetType === PrimitiveType.Short) {
-            rtn = (obj1 as Number).toShort() / (obj2 as Number).toShort()
+            (obj1 as Number).toShort() / (obj2 as Number).toShort()
         }else {
             throw IllegalArgumentException("无法计算div")
         }
@@ -77,7 +76,7 @@ object ArithmeticUtils {
     }
 
     fun eq(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
-        var rtn = if (targetType === PrimitiveType.Integer) {
+        val rtn = if (targetType === PrimitiveType.Integer) {
             (obj1 as Number).toInt() == (obj2 as Number).toInt()
         } else if (targetType === PrimitiveType.Float) {
             (obj1 as Number).toFloat() == (obj2 as Number).toFloat()
@@ -99,7 +98,7 @@ object ArithmeticUtils {
     }
 
     fun ge(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
-        var rtn = if (targetType === PrimitiveType.Integer) {
+        val rtn = if (targetType === PrimitiveType.Integer) {
             (obj1 as Number).toInt() >= (obj2 as Number).toInt()
         } else if (targetType === PrimitiveType.Float) {
             (obj1 as Number).toFloat() >= (obj2 as Number).toFloat()
@@ -116,7 +115,7 @@ object ArithmeticUtils {
     }
 
     fun gt(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
-        var rtn = if (targetType === PrimitiveType.Integer) {
+        val rtn = if (targetType === PrimitiveType.Integer) {
             (obj1 as Number).toInt() > (obj2 as Number).toInt()
         } else if (targetType === PrimitiveType.Float) {
             (obj1 as Number).toFloat() > (obj2 as Number).toFloat()
@@ -133,7 +132,7 @@ object ArithmeticUtils {
     }
 
     fun le(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
-        var rtn = if (targetType === PrimitiveType.Integer) {
+        val rtn = if (targetType === PrimitiveType.Integer) {
             (obj1 as Number).toInt() <= (obj2 as Number).toInt()
         } else if (targetType === PrimitiveType.Float) {
             (obj1 as Number).toFloat() <= (obj2 as Number).toFloat()
@@ -150,7 +149,7 @@ object ArithmeticUtils {
     }
 
     fun lt(obj1: Any, obj2: Any, targetType: PrimitiveType): Any {
-        var rtn = if (targetType === PrimitiveType.Integer) {
+        val rtn = if (targetType === PrimitiveType.Integer) {
             (obj1 as Number).toInt() < (obj2 as Number).toInt()
         } else if (targetType === PrimitiveType.Float) {
             (obj1 as Number).toFloat() < (obj2 as Number).toFloat()
@@ -164,5 +163,21 @@ object ArithmeticUtils {
             throw IllegalArgumentException("无法计算lt")
         }
         return Literal.of(rtn,PrimitiveType.Boolean)
+    }
+
+    fun incr(obj1: Any,targetType: PrimitiveType): Any {
+        return add(obj1, Literal.of(1,PrimitiveType.Integer), targetType)
+    }
+
+    fun decr(obj1: Any,targetType: PrimitiveType): Any {
+        return minus(obj1, Literal.of(1,PrimitiveType.Integer), targetType)
+    }
+
+    fun and(obj1: Any,obj2: Any):Any {
+        return Literal.of(obj1.toString().toBoolean() && obj2.toString().toBoolean(),PrimitiveType.Boolean)
+    }
+
+    fun or(obj1: Any,obj2: Any):Any {
+        return Literal.of(obj1.toString().toBoolean() || obj2.toString().toBoolean(),PrimitiveType.Boolean)
     }
 }
