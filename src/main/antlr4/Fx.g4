@@ -1,11 +1,15 @@
-﻿grammar Arithmetic;
+﻿grammar Fx;
 
 import CommonLexer;
 
+/**语法起始**/
+prog: expression EOF;
+
 expression
-    : primary
+    : function                          // 匹配函数,支持嵌套函数
+    | primary
     | expression '[' expression ']'
-    | expectType= '(' typeType ')' expression
+    | expectType= '(' typeType ')' expression   // 强转
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
     | prefix=('~'|'!') expression
@@ -25,8 +29,14 @@ expression
 //      expression
     ;
 
+expressionList
+    : expression (',' expression)*
+    ;
 
-primary
+function
+    : IDENTIFIER '(' parameter = expressionList? ')'
+            ;
+primary                                                                  // 优先级表达式、字面量、标识符
     : '(' expression ')'
     | literal
     | IDENTIFIER
@@ -54,7 +64,7 @@ floatLiteral
     ;
 
 typeType
-    : (IDENTIFIER | primitiveType)
+    : primitiveType
     ;
 
 primitiveType

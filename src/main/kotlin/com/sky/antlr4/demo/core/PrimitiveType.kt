@@ -19,7 +19,7 @@ class PrimitiveType private constructor(private val name: String) {
         val String = PrimitiveType("String")
         val Null = PrimitiveType("null")
 
-        val container = listOf(Integer,Long,Float,Double,Boolean,Byte,Char,Short,String,Null)
+        private val CONTAINER = listOf(Integer,Long,Float,Double,Boolean,Byte,Char,Short,String,Null)
 
         /**
          * 计算两个类型中比较“高”的一级，比如int和long相加，要取long
@@ -42,7 +42,7 @@ class PrimitiveType private constructor(private val name: String) {
             } else if (type1 === Short || type2 === Short) {
                 Short
             } else {
-                Byte // TODO 以上这些规则有没有漏洞？
+                Byte
             }
             return type
         }
@@ -57,8 +57,8 @@ class PrimitiveType private constructor(private val name: String) {
             return type === Byte || type === Short || type === Integer || type === Long || type === Float || type === Double
         }
 
-        fun get(identifier:String):PrimitiveType {
-            return container.first{ it.name.uppercase() == identifier.uppercase()}
+        fun match(type:String):PrimitiveType? {
+            return CONTAINER.firstOrNull{ it.name.uppercase() == type.uppercase() }
         }
     }
 }

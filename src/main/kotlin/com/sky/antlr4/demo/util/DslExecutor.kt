@@ -1,9 +1,10 @@
 ﻿package com.sky.antlr4.demo.util
 
-import com.sky.antlr4.demo.core.CustomArithmeticBaseVisitor
 import com.sky.antlr4.demo.core.DslContext
-import com.sky.antlr4.demo.parser.ArithmeticLexer
-import com.sky.antlr4.demo.parser.ArithmeticParser
+import com.sky.antlr4.demo.core.ErrorListener
+import com.sky.antlr4.demo.core.ExpFxBaseVisitor
+import com.sky.antlr4.demo.parser.FxLexer
+import com.sky.antlr4.demo.parser.FxParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
@@ -26,10 +27,12 @@ object DslExecutor {
         parser.removeErrorListeners();
         parser.setErrorHandler(strategy);
          */
-        val lexer = ArithmeticLexer(CharStreams.fromString(ctx.data.toString()))
-        val parser = ArithmeticParser(CommonTokenStream(lexer))
-        val parseTree = parser.expression()
-        val visitor = CustomArithmeticBaseVisitor()
-        return visitor.visit(parseTree)
+        val lexer = FxLexer(CharStreams.fromString(ctx.data.toString()))
+        val parser = FxParser(CommonTokenStream(lexer))
+        lexer.removeErrorListeners()
+        parser.removeErrorListeners()
+        parser.addErrorListener(ErrorListener)
+        val tree = parser.prog()
+        return ExpFxBaseVisitor().visit(tree)
     }
 }

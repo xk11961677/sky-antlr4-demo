@@ -40,6 +40,18 @@
 
 lexer grammar CommonLexer;
 
+// Keywords
+
+BOOLEAN:            'boolean' | 'Boolean';
+BYTE:               'byte' | 'Byte';
+CHAR:               'char' | 'Char';
+DOUBLE:             'double' | 'Double';
+FLOAT:              'float' | 'Float';
+INT:                'int' | 'Int';
+LONG:               'long' | 'Long';
+SHORT:              'short' | 'Short';
+STRING:             'string' | 'String';
+
 // Literals
 
 DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;

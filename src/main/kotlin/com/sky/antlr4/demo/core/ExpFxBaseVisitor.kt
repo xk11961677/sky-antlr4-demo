@@ -1,13 +1,17 @@
 ﻿package com.sky.antlr4.demo.core
 
-import com.sky.antlr4.demo.parser.ArithmeticBaseVisitor
-import com.sky.antlr4.demo.parser.ArithmeticParser.*
+import com.sky.antlr4.demo.parser.FxBaseVisitor
+import com.sky.antlr4.demo.parser.FxParser.*
 import java.lang.Boolean
 import kotlin.Any
 import kotlin.IllegalArgumentException
 
 
-class CustomArithmeticBaseVisitor : ArithmeticBaseVisitor<Any>() {
+class ExpFxBaseVisitor : FxBaseVisitor<Any>() {
+
+    override fun visitProg(ctx: ProgContext):Any {
+        return visit(ctx.expression())
+    }
 
     override fun visitExpression(ctx: ExpressionContext): Any {
         val rtn = if (ctx.bop != null && ctx.expression().size >= 2) {
@@ -31,9 +35,7 @@ class CustomArithmeticBaseVisitor : ArithmeticBaseVisitor<Any>() {
             }
             rtn
         }else if(ctx.expectType != null && ctx.expression().size ==1) {
-            val typeType = ctx.typeType()
-            val typeLiteral = typeType.primitiveType()?.text?:typeType.IDENTIFIER().text
-            val expectType= PrimitiveType.get(typeLiteral)
+            val expectType = this.visitPrimitiveType(ctx.typeType().primitiveType()) as PrimitiveType
             val value = visitExpression(ctx.expression(0))
             Literal.cast(value, expectType)
         }else if(ctx.prefix != null) {
@@ -160,25 +162,6 @@ class CustomArithmeticBaseVisitor : ArithmeticBaseVisitor<Any>() {
     }
 
     override fun visitPrimitiveType(ctx: PrimitiveTypeContext): Any {
-        val rtn = if (ctx.INT() != null) {
-            INT
-        } else if (ctx.LONG() != null) {
-            LONG
-        } else if (ctx.FLOAT() != null) {
-            FLOAT
-        } else if (ctx.DOUBLE() != null) {
-            DOUBLE
-        } else if (ctx.BOOLEAN() != null) {
-            BOOLEAN
-        } else if (ctx.CHAR() != null) {
-            CHAR
-        } else if (ctx.SHORT() != null) {
-            SHORT
-        } else if (ctx.BYTE() != null) {
-            BYTE
-        }else {
-            throw IllegalArgumentException("不支持的类型")
-        }
-        return rtn
+        return PrimitiveType.match(ctx.text) ?: throw IllegalArgumentException("不支持的类型")
     }
 }
