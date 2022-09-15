@@ -1,15 +1,15 @@
 ﻿package com.sky.antlr4.demo.core
 
-import com.sky.antlr4.demo.parser.FxBaseVisitor
-import com.sky.antlr4.demo.parser.FxParser.*
+import com.sky.antlr4.demo.parser.*
+import com.sky.antlr4.demo.parser.ExpressionParser.*
 import java.lang.Boolean
 import kotlin.Any
 import kotlin.IllegalArgumentException
 
 
-class ExpFxBaseVisitor : FxBaseVisitor<Any>() {
+class ExprBaseVisitor : ExpressionBaseVisitor<Any>() {
 
-    override fun visitProg(ctx: ProgContext):Any {
+    override fun visitExpr(ctx: ExprContext):Any {
         return visit(ctx.expression())
     }
 

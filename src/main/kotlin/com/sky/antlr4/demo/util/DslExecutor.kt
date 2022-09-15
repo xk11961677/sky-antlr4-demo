@@ -2,9 +2,9 @@
 
 import com.sky.antlr4.demo.core.DslContext
 import com.sky.antlr4.demo.core.ErrorListener
-import com.sky.antlr4.demo.core.ExpFxBaseVisitor
-import com.sky.antlr4.demo.parser.FxLexer
-import com.sky.antlr4.demo.parser.FxParser
+import com.sky.antlr4.demo.core.ExprBaseVisitor
+import com.sky.antlr4.demo.parser.ExpressionLexer
+import com.sky.antlr4.demo.parser.ExpressionParser
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 
@@ -27,12 +27,12 @@ object DslExecutor {
         parser.removeErrorListeners();
         parser.setErrorHandler(strategy);
          */
-        val lexer = FxLexer(CharStreams.fromString(ctx.data.toString()))
-        val parser = FxParser(CommonTokenStream(lexer))
+        val lexer = ExpressionLexer(CharStreams.fromString(ctx.data.toString()))
+        val parser = ExpressionParser(CommonTokenStream(lexer))
         lexer.removeErrorListeners()
         parser.removeErrorListeners()
         parser.addErrorListener(ErrorListener)
-        val tree = parser.prog()
-        return ExpFxBaseVisitor().visit(tree)
+        val tree = parser.expr()
+        return ExprBaseVisitor().visit(tree)
     }
 }

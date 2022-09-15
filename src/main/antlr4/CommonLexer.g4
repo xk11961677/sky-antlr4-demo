@@ -37,6 +37,9 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/**
+词法规则文件
+**/
 
 lexer grammar CommonLexer;
 

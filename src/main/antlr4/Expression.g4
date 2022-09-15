@@ -1,9 +1,9 @@
-﻿grammar Fx;
+﻿grammar Expression;
 
 import CommonLexer;
 
 /**语法起始**/
-prog: expression EOF;
+expr: expression EOF;
 
 expression
     : function                          // 匹配函数,支持嵌套函数
