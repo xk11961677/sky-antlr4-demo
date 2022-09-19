@@ -43,7 +43,7 @@
 
 ## anrlt4
 - 优先级自上而下降低
-- 默认左结合，而右结合需要使用 运算符<assoc=right> 
+- 默认左结合，而右结合需要使用 运算符<assoc=right>
 - 直接左递归可以处理，间接左递归无法处理。如
 ```antlrv4
 expr : expr '+' expr    // 匹配由“+”运算符连接的子表达式
@@ -72,13 +72,15 @@ expo : expr '^'<assoc=right> expr ;
 
  **[JS生成AST网站](https://resources.jointjs.com/demos/javascript-ast)**
 
- **[antlr4学习资料](https://www.wenjiangs.com/doc/u8sfna2t)**
+ **[antlr学习资料](https://www.wenjiangs.com/doc/u8sfna2t)**
 
- **[antlr4权威指南]()**
+ **[语法分析算法讲解01](https://www.nosuchfield.com/2017/07/30/Talk-about-compilation-principles-2/)**
 
- **[语法分析之自顶向下分析算法](http://cn-sec.com/archives/317871.html)**
+ **[语法分析算法讲解02](http://cn-sec.com/archives/317871.html)**
 
- **编译原理**
+ **[编译原理]()**
+ 
+ **[antlr权威指南]()**
 
  ****
 

@@ -1,7 +1,7 @@
 ﻿package com.sky.antlr4.demo.core
 
 import com.sky.antlr4.demo.parser.*
-import com.sky.antlr4.demo.parser.ExpressionParser.*
+import com.sky.antlr4.demo.parser.CommonLexer.*
 import java.lang.Boolean
 import kotlin.Any
 import kotlin.IllegalArgumentException
@@ -9,11 +9,11 @@ import kotlin.IllegalArgumentException
 
 class ExprBaseVisitor : ExpressionBaseVisitor<Any>() {
 
-    override fun visitExpr(ctx: ExprContext):Any {
+    override fun visitExpr(ctx: ExpressionParser.ExprContext):Any {
         return visit(ctx.expression())
     }
 
-    override fun visitExpression(ctx: ExpressionContext): Any {
+    override fun visitExpression(ctx: ExpressionParser.ExpressionContext): Any {
         val rtn = if (ctx.bop != null && ctx.expression().size >= 2) {
             val left = visitExpression(ctx.expression(0))
             val right = visitExpression(ctx.expression(1))
@@ -74,7 +74,7 @@ class ExprBaseVisitor : ExpressionBaseVisitor<Any>() {
         return rtn
     }
 
-    private fun calculate(ctx: ExpressionContext,left:Any, right:Any , expectType: PrimitiveType?): Any {
+    private fun calculate(ctx: ExpressionParser.ExpressionContext, left:Any, right:Any, expectType: PrimitiveType?): Any {
         var leftObject = (left as Literal).value
         var rightObject = (right as Literal).value
         var leftType = left.type
@@ -103,7 +103,7 @@ class ExprBaseVisitor : ExpressionBaseVisitor<Any>() {
         return rtn
     }
 
-    override fun visitLiteral(ctx: LiteralContext): Any {
+    override fun visitLiteral(ctx: ExpressionParser.LiteralContext): Any {
         //整数
         val rtn = if (ctx.integerLiteral() != null) {
             visitIntegerLiteral(ctx.integerLiteral())
@@ -128,7 +128,7 @@ class ExprBaseVisitor : ExpressionBaseVisitor<Any>() {
         return rtn
     }
 
-    override fun visitIntegerLiteral(ctx: IntegerLiteralContext): Any {
+    override fun visitIntegerLiteral(ctx: ExpressionParser.IntegerLiteralContext): Any {
         val rtn = if (ctx.DECIMAL_LITERAL() != null) {
             Literal.of(Integer.valueOf(ctx.DECIMAL_LITERAL().text),PrimitiveType.Integer)
         }else if(ctx.HEX_LITERAL() != null) {
@@ -143,11 +143,11 @@ class ExprBaseVisitor : ExpressionBaseVisitor<Any>() {
         return rtn
     }
 
-    override fun visitFloatLiteral(ctx: FloatLiteralContext): Any {
+    override fun visitFloatLiteral(ctx: ExpressionParser.FloatLiteralContext): Any {
         return Literal.of(java.lang.Float.valueOf(ctx.text),PrimitiveType.Float)
     }
 
-    override fun visitPrimary(ctx: PrimaryContext): Any {
+    override fun visitPrimary(ctx: ExpressionParser.PrimaryContext): Any {
         //字面量
         val rtn = if (ctx.literal() != null) {
             visitLiteral(ctx.literal())
@@ -161,7 +161,7 @@ class ExprBaseVisitor : ExpressionBaseVisitor<Any>() {
         return rtn
     }
 
-    override fun visitPrimitiveType(ctx: PrimitiveTypeContext): Any {
+    override fun visitPrimitiveType(ctx: ExpressionParser.PrimitiveTypeContext): Any {
         return PrimitiveType.match(ctx.text) ?: throw IllegalArgumentException("不支持的类型")
     }
 }
