@@ -72,9 +72,15 @@ expo : expr '^'<assoc=right> expr ;
 
  **[JS生成AST网站](https://resources.jointjs.com/demos/javascript-ast)**
 
- **[antlr4](https://www.wenjiangs.com/doc/u8sfna2t)**
+ **[antlr学习资料](https://www.wenjiangs.com/doc/u8sfna2t)**
 
- **编译原理**
+ **[语法分析算法讲解01](https://www.nosuchfield.com/2017/07/30/Talk-about-compilation-principles-2/)**
+
+ **[语法分析算法讲解02](http://cn-sec.com/archives/317871.html)**
+
+ **[编译原理]()**
+ 
+ **[antlr权威指南]()**
 
  ****
 
